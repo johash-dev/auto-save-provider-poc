@@ -1,1 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
+
+
+.recommended-field-error {
+  color: #1049CD;
+  margin: 0;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.is-recommended {
+  border-color: #1049CD;
+}
