@@ -1,7 +1,21 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { IAutoSaveProvider } from '../auto-save-provider/auto-save-provider.interface';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControlName,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { AUTOSAVEPROVIDER } from '../auto-save-provider/auto-save-provider.token';
+import { CustomerFormData } from './customer-model';
 
 interface FormStatus {
   isFormValid: boolean;
@@ -21,6 +35,12 @@ interface FormStatus {
 export class CustomerFormComponent implements IAutoSaveProvider {
   form!: FormGroup;
 
+  @Input()
+  formData!: CustomerFormData | null | undefined;
+
+  @Input()
+  visitedRoutes: string[] | null = [];
+
   @Output()
   autoSave = new EventEmitter();
 
@@ -29,6 +49,9 @@ export class CustomerFormComponent implements IAutoSaveProvider {
 
   @Output()
   formValuesChange = new EventEmitter();
+
+  @ViewChildren(FormControlName, { read: ElementRef })
+  formInputElements!: QueryList<ElementRef>;
 
   validate(): void {
     console.log('validate');

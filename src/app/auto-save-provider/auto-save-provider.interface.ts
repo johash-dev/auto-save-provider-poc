@@ -1,5 +1,5 @@
 import { FormGroup } from '@angular/forms';
-import { EventEmitter } from '@angular/core';
+import { ElementRef, EventEmitter, QueryList } from '@angular/core';
 
 interface FormStatus {
   isFormValid: boolean;
@@ -8,6 +8,10 @@ interface FormStatus {
 
 export interface IAutoSaveProvider {
   form: FormGroup;
+  formInputElements: QueryList<ElementRef>;
+  formData: unknown;
+  visitedRoutes: string[] | null;
+
   autoSave: EventEmitter<unknown>;
   formValuesChange: EventEmitter<unknown>;
   formStatus: EventEmitter<FormStatus>;
