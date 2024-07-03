@@ -1,4 +1,5 @@
 import {
+  AfterContentInit,
   Directive,
   ElementRef,
   OnDestroy,
@@ -11,7 +12,9 @@ import { Subject, takeUntil } from 'rxjs';
 @Directive({
   selector: '[appRecommendedField]',
 })
-export class RecommendedFieldDirective implements OnInit, OnDestroy {
+export class RecommendedFieldDirective
+  implements OnInit, OnDestroy, AfterContentInit
+{
   private control!: NgControl;
   private unsubscribe = new Subject<void>();
 
@@ -28,21 +31,21 @@ export class RecommendedFieldDirective implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.ngControl) {
       this.control = this.ngControl;
+
       this.renderer.listen(this.el.nativeElement, 'blur', () => {
-        const parentElement = this.el.nativeElement.parentElement;
-        const recommendedFieldDiv =
-          parentElement.querySelector('.recommended-field');
-        if (recommendedFieldDiv) {
-          if (this.control.value === null || this.control.value === '') {
-            recommendedFieldDiv.innerHTML = this.infoParagraph;
-            this.renderer.addClass(this.el.nativeElement, 'is-recommended');
-          } else {
-            recommendedFieldDiv.innerHTML = '';
-            this.renderer.removeClass(this.el.nativeElement, 'is-recommended');
-          }
+        if (this.control.value === null || this.control.value === '') {
+          this.updateWarning(true);
+        } else {
+          this.updateWarning(false);
         }
       });
       this.handleValueChanges();
+    }
+  }
+
+  ngAfterContentInit() {
+    if (this.control.touched) {
+      this.updateWarning(true);
     }
   }
 
@@ -50,17 +53,26 @@ export class RecommendedFieldDirective implements OnInit, OnDestroy {
     this.control.valueChanges
       ?.pipe(takeUntil(this.unsubscribe))
       .subscribe((value) => {
-        const parentElement = this.el.nativeElement.parentElement;
-        const recommendedFieldDiv =
-          parentElement.querySelector('.recommended-field');
         if (value !== null && value !== '') {
-          recommendedFieldDiv.innerHTML = '';
-          this.renderer.removeClass(this.el.nativeElement, 'is-recommended');
+          this.updateWarning(false);
         } else {
-          recommendedFieldDiv.innerHTML = this.infoParagraph;
-          this.renderer.addClass(this.el.nativeElement, 'is-recommended');
+          this.updateWarning(true);
         }
       });
+  }
+
+  updateWarning(value: boolean): void {
+    const parentElement = this.el.nativeElement.parentElement;
+    const recommendedFieldDiv =
+      parentElement.querySelector('.recommended-field');
+    if (!recommendedFieldDiv) return;
+    if (value) {
+      recommendedFieldDiv.innerHTML = this.infoParagraph;
+      this.renderer.addClass(this.el.nativeElement, 'is-recommended');
+    } else {
+      recommendedFieldDiv.innerHTML = '';
+      this.renderer.removeClass(this.el.nativeElement, 'is-recommended');
+    }
   }
 
   ngOnDestroy() {
