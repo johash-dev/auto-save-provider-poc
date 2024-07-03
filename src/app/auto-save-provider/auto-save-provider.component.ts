@@ -26,6 +26,7 @@ export class AutoSaveProviderComponent
   private unsubscribe = new Subject<void>();
 
   form!: FormGroup;
+  initialValidationsTriggered = false;
 
   constructor(private router: Router) {}
 
@@ -60,7 +61,7 @@ export class AutoSaveProviderComponent
       });
   }
 
-  handleControlInteractions(): void {
+  private handleControlInteractions(): void {
     Object.keys(this.form.controls).forEach((controlName) => {
       const formControl = this.form.get(controlName);
 
@@ -78,7 +79,7 @@ export class AutoSaveProviderComponent
     });
   }
 
-  getValidFields(): { [key: string]: any } {
+  private getValidFields(): { [key: string]: any } {
     const validFields: { [key: string]: any } = {};
 
     Object.keys(this.form.controls).forEach((controlName) => {
@@ -91,7 +92,21 @@ export class AutoSaveProviderComponent
     return validFields;
   }
 
-  validateForm(): void {
+  private triggerInitialValidations() {
+    const { visitedRoutes, formData } = this.autoSaveProvider;
+
+    if (
+      visitedRoutes?.length &&
+      visitedRoutes?.includes(this.router.url) &&
+      ((Array.isArray(formData) && formData.length > 0) ||
+        (!Array.isArray(formData) && formData !== undefined))
+    ) {
+      this.validateForm();
+      this.initialValidationsTriggered = true;
+    }
+  }
+
+  private validateForm(): void {
     this.form.markAllAsTouched();
     this.autoSaveProvider.validate();
     this.autoSaveProvider.formStatus.emit({
