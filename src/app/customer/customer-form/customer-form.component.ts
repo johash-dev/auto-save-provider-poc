@@ -7,14 +7,14 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { IAutoSaveProvider } from '../auto-save-provider/auto-save-provider.interface';
+import { IAutoSaveProvider } from '../../auto-save-provider/auto-save-provider.interface';
 import {
   FormBuilder,
   FormControlName,
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { AUTOSAVEPROVIDER } from '../auto-save-provider/auto-save-provider.token';
+import { AUTOSAVEPROVIDER } from '../../auto-save-provider/auto-save-provider.token';
 import { CustomerFormData } from './customer-model';
 
 interface FormStatus {
@@ -35,6 +35,8 @@ interface FormStatus {
 export class CustomerFormComponent implements IAutoSaveProvider {
   form!: FormGroup;
 
+  recommendedFields = ['firstName', 'lastName'];
+
   @Input()
   formData!: CustomerFormData | null | undefined;
 
@@ -49,6 +51,9 @@ export class CustomerFormComponent implements IAutoSaveProvider {
 
   @Output()
   formValuesChange = new EventEmitter();
+
+  @Output()
+  recommendedFieldsFilled = new EventEmitter();
 
   @ViewChildren(FormControlName, { read: ElementRef })
   formInputElements!: QueryList<ElementRef>;

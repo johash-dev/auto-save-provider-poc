@@ -1,8 +1,6 @@
 <div class="container mt-4">
-  <h1>Auto Save Provider - POC</h1>
+  <app-navbar></app-navbar>
   <div>
-    <app-auto-save-provider>
-      <app-customer-form (autoSave)="onSave($event)" (formValuesChange)="onFormValueChanges($event)"></app-customer-form>
-    </app-auto-save-provider>
+    <router-outlet></router-outlet>
   </div>
 </div>

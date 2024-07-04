@@ -11,10 +11,12 @@ export interface IAutoSaveProvider {
   formInputElements: QueryList<ElementRef>;
   formData: unknown;
   visitedRoutes: string[] | null;
+  recommendedFields: string[];
 
   autoSave: EventEmitter<unknown>;
   formValuesChange: EventEmitter<unknown>;
   formStatus: EventEmitter<FormStatus>;
+  recommendedFieldsFilled: EventEmitter<unknown>;
 
   validate: () => void;
 }

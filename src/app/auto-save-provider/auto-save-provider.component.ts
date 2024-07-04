@@ -3,7 +3,6 @@ import {
   Component,
   ContentChild,
   OnDestroy,
-  OnInit,
 } from '@angular/core';
 import { AUTOSAVEPROVIDER } from './auto-save-provider.token';
 import { IAutoSaveProvider } from './auto-save-provider.interface';
@@ -17,25 +16,21 @@ import { NavigationStart, Router } from '@angular/router';
     <ng-content></ng-content>
   </div> `,
 })
-export class AutoSaveProviderComponent
-  implements AfterContentInit, OnDestroy, OnInit
-{
+export class AutoSaveProviderComponent implements AfterContentInit, OnDestroy {
   @ContentChild(AUTOSAVEPROVIDER)
   autoSaveProvider!: IAutoSaveProvider;
 
   private unsubscribe = new Subject<void>();
 
   form!: FormGroup;
+  recommendedFields!: string[];
   initialValidationsTriggered = false;
 
   constructor(private router: Router) {}
 
-  ngOnInit() {
-    console.log(window.history.state);
-  }
-
   ngAfterContentInit() {
     this.form = this.autoSaveProvider.form;
+    this.recommendedFields = this.autoSaveProvider.recommendedFields;
 
     this.form.valueChanges
       .pipe(takeUntil(this.unsubscribe), distinctUntilChanged())
@@ -55,6 +50,9 @@ export class AutoSaveProviderComponent
         takeUntil(this.unsubscribe),
       )
       .subscribe(() => {
+        this.autoSaveProvider.recommendedFieldsFilled.emit(
+          this.checkRecommendedFields(),
+        );
         if (this.form.invalid && (this.form.dirty || this.form.touched)) {
           this.validateForm();
         }
@@ -113,6 +111,34 @@ export class AutoSaveProviderComponent
       isFormValid: this.form.valid,
       isFormDirty: this.form.dirty,
     });
+  }
+
+  checkRecommendedFields(): boolean {
+    for (let field of this.recommendedFields) {
+      const control = this.form.get(field);
+      if (control) {
+        if (!control.value || control.invalid) {
+          return false;
+        }
+      }
+    }
+
+    const groupNames = ['doData', 'gqData'];
+    for (let groupName of groupNames) {
+      const group = this.form.get(groupName) as FormGroup;
+      if (group) {
+        for (let field of this.recommendedFields) {
+          const control = group.get(field);
+          if (control) {
+            if (!control.value || control.invalid) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   ngOnDestroy() {

@@ -1,0 +1,10 @@
+<section>
+  <app-auto-save-provider>
+    <app-customer-form
+      (autoSave)="onSave($event)"
+      (formValuesChange)="onFormValueChanges($event)"
+      (formStatus)="onFormStatusChange($event)"
+      (recommendedFieldsFilled)="onRecommendedFieldsFilled($event)"
+    ></app-customer-form>
+  </app-auto-save-provider>
+</section>
